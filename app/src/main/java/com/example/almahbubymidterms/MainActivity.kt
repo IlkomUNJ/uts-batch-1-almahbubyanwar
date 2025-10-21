@@ -132,12 +132,12 @@ fun InputContacts(modifier: Modifier = Modifier, onNavigateBack: () -> Unit,
                   onAddContact: (name: String, address: String, phone: String,
                           email: String) -> Unit,
                   onEditContact: (index: Int, contact: Contact) -> Unit,
-mode: InputMode = InputMode.ADD, index: Int = 0, contact: Contact = Contact()
+mode: InputMode = InputMode.ADD, index: Int = -1
 ) {
-    var inputName by rememberSaveable { mutableStateOf(contact.name) }
-    var inputAddress by rememberSaveable { mutableStateOf(contact.address) }
-    var inputPhone by rememberSaveable { mutableStateOf(contact.phone) }
-    var inputEmail by rememberSaveable { mutableStateOf(contact.email) }
+    var inputName by rememberSaveable { mutableStateOf("") }
+    var inputAddress by rememberSaveable { mutableStateOf("") }
+    var inputPhone by rememberSaveable { mutableStateOf("") }
+    var inputEmail by rememberSaveable { mutableStateOf("") }
 
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(colors = TopAppBarDefaults.topAppBarColors(
