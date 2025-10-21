@@ -4,14 +4,43 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.Path
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.almahbubymidterms.ui.theme.AlmahbubymidtermsTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,10 +49,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AlmahbubymidtermsTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    Main(Modifier.padding(innerPadding))
                 }
             }
         }
@@ -31,17 +57,107 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun Main(modifier: Modifier) {
+    ListContact(modifier)
 }
 
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    AlmahbubymidtermsTheme {
-        Greeting("Android")
+fun ContactItem(name: String, address: String) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 8.dp, horizontal = 12.dp)) {
+        Text(name, fontWeight = FontWeight.Bold)
+        Text(address)
+    }
+}
+
+class Contact(
+    val name: String = "",
+    val address: String = "",
+    val phone: String = "",
+    val email: String = ""
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ListContact(modifier: Modifier) {
+    val contacts = listOf(
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
+            phone = "+18006741", email = "bub@almahbuby.com"
+        ),
+    )
+
+    Column() {
+        TopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.primary,
+            ),
+            title = {
+            Text("Dashboard")
+        })
+        Box() {
+            LazyColumn() {
+                items(contacts) {contact ->
+                    ContactItem(contact.name, contact.address)
+                }
+            }
+            FloatingActionButton(
+                onClick = {},
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = (-32).dp, y = (-32).dp)
+            ) {
+                Icon(Icons.Rounded.Add, "Add contact.")
+            }
+        }
     }
 }
