@@ -42,7 +42,12 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -66,17 +71,42 @@ class MainActivity : ComponentActivity() {
 sealed class Screen(val route: String) {
     data object Dash: Screen("Dash")
     data object Input: Screen("Input")
+    data object Edit: Screen("Edit")
 }
 
 @Composable
 fun Main(modifier: Modifier) {
     val navController = rememberNavController()
+    val contactsState = rememberSaveable { mutableStateListOf<Contact>() }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    fun onAddContact(name: String, address: String, phone: String, email: String): Unit {
+
+        if (address.split(" ").size >= 5) {
+            contactsState.add(Contact(name, address, phone, email))
+            navController.popBackStack()
+        }
+    }
+
+    fun onEditContact(index: Int, contact: Contact) {
+        if (contact.address.split(" ").size >= 5) {
+            contactsState[index] = contact
+            navController.popBackStack()
+        }
+    }
+
     NavHost(navController = navController, startDestination = Screen.Dash.route) {
         composable(route = Screen.Dash.route) {
-            ListContact(modifier, navController = navController)
+            ListContact(modifier, navController = navController, contacts = contactsState)
         }
         composable(route = Screen.Input.route) {
-            InputContacts(modifier, onNavigateBack = {navController.popBackStack()})
+            InputContacts(modifier, onNavigateBack = {navController.popBackStack()},
+                onAddContact = { name, address, phone, email ->
+                    onAddContact(name, address, phone, email)
+                },
+                onEditContact = { index, contact ->
+                    onEditContact(index, contact)
+                })
         }
     }
 }
@@ -99,19 +129,22 @@ enum class InputMode {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputContacts(modifier: Modifier = Modifier, onNavigateBack: () -> Unit,
-mode: InputMode = InputMode.ADD, name: String = "", address: String = "",
-                  phone: String = "", email: String = "", index: Int = 0) {
-    var inputName by rememberSaveable { mutableStateOf(name) }
-    var inputAddress by rememberSaveable { mutableStateOf(address) }
-    var inputPhone by rememberSaveable { mutableStateOf(phone) }
-    var inputEmail by rememberSaveable { mutableStateOf(email) }
+                  onAddContact: (name: String, address: String, phone: String,
+                          email: String) -> Unit,
+                  onEditContact: (index: Int, contact: Contact) -> Unit,
+mode: InputMode = InputMode.ADD, index: Int = 0, contact: Contact = Contact()
+) {
+    var inputName by rememberSaveable { mutableStateOf(contact.name) }
+    var inputAddress by rememberSaveable { mutableStateOf(contact.address) }
+    var inputPhone by rememberSaveable { mutableStateOf(contact.phone) }
+    var inputEmail by rememberSaveable { mutableStateOf(contact.email) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.primary,
         ), title={
-            Text("Input")
+            Text("Add a contact")
         }, navigationIcon = {
             IconButton(onClick = onNavigateBack) {
                 Icon(
@@ -150,8 +183,22 @@ mode: InputMode = InputMode.ADD, name: String = "", address: String = "",
                 label = {Text("Phone No.")},
                 modifier = Modifier.fillMaxWidth()
             )
-            Button(onClick = {}) {
-                Text("Add")
+            Button(onClick = {
+                if (mode == InputMode.EDIT) {
+                    onEditContact(
+                        index,
+                        Contact(inputName, inputAddress, inputPhone, inputEmail)
+                    )
+                }
+                else {
+                    onAddContact(
+                        inputName, inputAddress,
+                        inputPhone, inputEmail
+                    )
+                }
+
+            }) {
+                Text(if (mode == InputMode.EDIT) "Edit" else "Add")
             }
         }
     }
@@ -166,21 +213,7 @@ class Contact(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListContact(modifier: Modifier, navController: NavHostController) {
-    val contacts = listOf(
-        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
-            phone = "+18006741", email = "bub@almahbuby.com"
-        ),
-        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
-            phone = "+18006741", email = "bub@almahbuby.com"
-        ),
-        Contact(name = "Bubsie", address = "Eastern St. 1, Nowhere, CA",
-            phone = "+18006741", email = "bub@almahbuby.com"
-        )
-    )
-
-    val contactsState = rememberSaveable {mutableStateOf<List<Contact>>(listOf())}
-
+fun ListContact(modifier: Modifier, navController: NavHostController, contacts: SnapshotStateList<Contact>) {
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
